@@ -1,0 +1,33 @@
+{
+  "LR_C0.1": {
+    "val_macro_f1": 0.7800586510263929
+  },
+  "LR_C1": {
+    "val_macro_f1": 0.7927795174065205
+  },
+  "LR_C10": {
+    "val_macro_f1": 0.7957194658504092
+  },
+  "LinearSVM_C0.1": {
+    "val_macro_f1": 0.7917168599914295
+  },
+  "LinearSVM_C1": {
+    "val_macro_f1": 0.8032092596972564
+  },
+  "LinearSVM_C10": {
+    "val_macro_f1": 0.7904427173329608
+  },
+  "selected": {
+    "model": "LinearSVM",
+    "C": 1,
+    "val_macro_f1": 0.8032092596972564,
+    "test": {
+      "accuracy": 0.7828,
+      "macro_f1": 0.7734070515725551,
+      "macro_precision": 0.7754291983993804,
+      "macro_recall": 0.7718017614569339,
+      "weighted_f1": 0.7820803045409227,
+      "off_f1": 0.7272727272727273
+    }
+  }
+}
