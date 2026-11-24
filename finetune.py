@@ -48,8 +48,9 @@ args = TrainingArguments(output_dir=a.out, num_train_epochs=a.epochs, learning_r
     per_device_train_batch_size=a.bs, per_device_eval_batch_size=64, eval_strategy="epoch",
     save_strategy="epoch", load_best_model_at_end=True, metric_for_best_model="macro_f1",
     save_total_limit=1, seed=a.seed, fp16=torch.cuda.is_available(), report_to="none", weight_decay=0.01)
-t = WTrainer(model=model, args=args, train_dataset=dtr, eval_dataset=dva, tokenizer=tok, compute_metrics=cm)
+t = WTrainer(model=model, args=args, train_dataset=dtr, eval_dataset=dva, processing_class=tok, compute_metrics=cm)
 t0 = time.time(); t.train(); train_s = time.time() - t0
+val_m = t.evaluate()
 
 pred = t.predict(dte); te_m = metrics(te.y.values, pred.predictions.argmax(-1))
 t.save_model(a.out); tok.save_pretrained(a.out)
@@ -63,7 +64,7 @@ lat_ms = (time.time() - t1) / len(sample) * 1000
 size_mb = sum(os.path.getsize(os.path.join(a.out, f)) for f in os.listdir(a.out)
               if f.endswith((".safetensors", ".bin"))) / 1e6
 res = dict(model=a.model, args=vars(a), train_seconds=round(train_s), params_m=round(sum(x.numel() for x in model.parameters()) / 1e6, 1),
-           disk_mb=round(size_mb, 1), cpu_latency_ms=round(lat_ms, 1), val=t.evaluate(), test=te_m,
+           disk_mb=round(size_mb, 1), cpu_latency_ms=round(lat_ms, 1), val=val_m, test=te_m,
            gpu=torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu")
 os.makedirs("results", exist_ok=True)
 json.dump(res, open(f"results/{os.path.basename(a.out.rstrip('/'))}.json", "w"), indent=2)
