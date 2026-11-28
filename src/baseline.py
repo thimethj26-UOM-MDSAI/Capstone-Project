@@ -1,6 +1,8 @@
-"""TF-IDF baselines (word + char n-grams) with LR / linear SVM. Selects on validation, reports test once."""
-import json
+"""TF-IDF baselines (word + char n-grams) with LR / linear SVM. Selects on validation, reports test once.
+Also saves test predictions (for McNemar) and deployment cost (size, CPU latency) like the transformers."""
+import json, os, tempfile, time
 import numpy as np
+import joblib
 from scipy.sparse import hstack
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -26,8 +28,24 @@ def build_features(tr, va, te, keep_emoji=False):
     return f(True, Xtr), f(False, Xva), f(False, Xte), (w, c)
 
 
+def deployment_cost(w, c, model, texts, keep_emoji=False, n=100):
+    """Disk size of the whole pipeline (vectorizers + classifier) and CPU latency per tweet (batch=1),
+    measured the same way as the transformers: cleaning + features + prediction, one tweet at a time."""
+    with tempfile.TemporaryDirectory() as d:
+        path = os.path.join(d, "pipeline.joblib")
+        joblib.dump((w, c, model), path)
+        size_mb = os.path.getsize(path) / 1e6
+    sample = list(texts[:n])
+    t0 = time.time()
+    for s in sample:
+        x = clean(s, keep_emoji=keep_emoji)
+        model.predict(hstack([w.transform([x]), c.transform([x])]).tocsr())
+    return dict(disk_mb=round(size_mb, 1), cpu_latency_ms=round((time.time() - t0) / len(sample) * 1000, 2))
+
+
 def run_baselines(tr, va, te, keep_emoji=False, tag="baseline"):
-    Xtr, Xva, Xte, _ = build_features(tr, va, te, keep_emoji)
+    t_start = time.time()
+    Xtr, Xva, Xte, (w, c) = build_features(tr, va, te, keep_emoji)
     models = {
         "LR": lambda C: LogisticRegression(C=C, class_weight="balanced", max_iter=2000, random_state=SEED),
         "LinearSVM": lambda C: LinearSVC(C=C, class_weight="balanced", random_state=SEED),
@@ -41,6 +59,10 @@ def run_baselines(tr, va, te, keep_emoji=False, tag="baseline"):
                 best = (vf, name, C, m)
             out[f"{name}_C{C}"] = dict(val_macro_f1=vf)
     vf, name, C, m = best  # test set touched once, with the validation-selected config
-    out["selected"] = dict(model=name, C=C, val_macro_f1=vf, test=metrics(te["y"], m.predict(Xte)))
+    test_pred = m.predict(Xte)
+    out["selected"] = dict(model=name, C=C, val_macro_f1=vf, test=metrics(te["y"], test_pred),
+                           cost=deployment_cost(w, c, m, list(te["text"]), keep_emoji),
+                           total_seconds=round(time.time() - t_start))
     (RESULTS_DIR / f"{tag}.json").write_text(json.dumps(out, indent=2))
+    np.save(RESULTS_DIR / f"{tag}_test_preds.npy", np.asarray(test_pred))  # same row order as the test set; for McNemar
     return out

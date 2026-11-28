@@ -1,6 +1,9 @@
 """Fine-tune a transformer classifier on SOLD.
-Usage: python finetune.py --model xlm-roberta-base --out models/xlmr
-Selects best epoch on validation; evaluates test once at the end; records size + latency."""
+Usage:  python finetune.py --model xlm-roberta-base --out models/xlmr                 (seed 42, the main run)
+        python finetune.py --model xlm-roberta-base --out models/xlmr_s1 --seed 1    (extra seed)
+The data split is ALWAYS the same (fixed in src/config.py); --seed only changes weight init, dropout and batch order.
+Selects best epoch on validation; evaluates test once at the end; records size + latency.
+Results go to results/<basename of --out>.json and results/<basename of --out>_test_preds.npy"""
 import argparse, json, time, os
 import numpy as np, torch
 from torch import nn
@@ -18,6 +21,7 @@ p.add_argument("--bs", type=int, default=16); p.add_argument("--max_len", type=i
 p.add_argument("--seed", type=int, default=42); p.add_argument("--keep_emoji", action="store_true")
 a = p.parse_args()
 set_seed(a.seed)
+name = os.path.basename(a.out.rstrip("/\\"))
 
 tr, va, te = load_sold()
 tok = AutoTokenizer.from_pretrained(a.model)
@@ -50,7 +54,7 @@ args = TrainingArguments(output_dir=a.out, num_train_epochs=a.epochs, learning_r
     save_total_limit=1, seed=a.seed, fp16=torch.cuda.is_available(), report_to="none", weight_decay=0.01)
 t = WTrainer(model=model, args=args, train_dataset=dtr, eval_dataset=dva, processing_class=tok, compute_metrics=cm)
 t0 = time.time(); t.train(); train_s = time.time() - t0
-val_m = t.evaluate()
+val_m = t.evaluate()  # must run while the model is still on the GPU (before the CPU latency test below)
 
 pred = t.predict(dte); te_m = metrics(te.y.values, pred.predictions.argmax(-1))
 t.save_model(a.out); tok.save_pretrained(a.out)
@@ -67,6 +71,6 @@ res = dict(model=a.model, args=vars(a), train_seconds=round(train_s), params_m=r
            disk_mb=round(size_mb, 1), cpu_latency_ms=round(lat_ms, 1), val=val_m, test=te_m,
            gpu=torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu")
 os.makedirs("results", exist_ok=True)
-json.dump(res, open(f"results/{os.path.basename(a.out.rstrip('/'))}.json", "w"), indent=2)
-np.save(f"results/{os.path.basename(a.out.rstrip('/'))}_test_preds.npy", pred.predictions.argmax(-1))  # for McNemar later
+json.dump(res, open(f"results/{name}.json", "w"), indent=2)
+np.save(f"results/{name}_test_preds.npy", pred.predictions.argmax(-1))  # for McNemar
 print(json.dumps(res, indent=2))

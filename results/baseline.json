@@ -28,6 +28,11 @@
       "macro_recall": 0.7718017614569339,
       "weighted_f1": 0.7820803045409227,
       "off_f1": 0.7272727272727273
-    }
+    },
+    "cost": {
+      "disk_mb": 3.2,
+      "cpu_latency_ms": 2.2
+    },
+    "total_seconds": 9
   }
 }

@@ -1,0 +1,35 @@
+{
+  "model": "xlm-roberta-base",
+  "args": {
+    "model": "xlm-roberta-base",
+    "out": "/content/xlmr_s1",
+    "epochs": 4,
+    "lr": 2e-05,
+    "bs": 16,
+    "max_len": 128,
+    "seed": 1,
+    "keep_emoji": false
+  },
+  "train_seconds": 391,
+  "params_m": 278.0,
+  "disk_mb": 1112.2,
+  "cpu_latency_ms": 161.5,
+  "val": {
+    "eval_loss": 0.44000720977783203,
+    "eval_macro_f1": 0.8370931206752102,
+    "eval_accuracy": 0.8413333333333334,
+    "eval_runtime": 1.1984,
+    "eval_samples_per_second": 625.837,
+    "eval_steps_per_second": 10.013,
+    "epoch": 4.0
+  },
+  "test": {
+    "accuracy": 0.8464,
+    "macro_f1": 0.8402635651175561,
+    "macro_precision": 0.8414330790163442,
+    "macro_recall": 0.8392131495579771,
+    "weighted_f1": 0.8461495332701044,
+    "off_f1": 0.808955223880597
+  },
+  "gpu": "Tesla T4"
+}

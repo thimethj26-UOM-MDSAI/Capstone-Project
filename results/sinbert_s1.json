@@ -1,0 +1,35 @@
+{
+  "model": "NLPC-UOM/SinBERT-large",
+  "args": {
+    "model": "NLPC-UOM/SinBERT-large",
+    "out": "/content/sinbert_s1",
+    "epochs": 4,
+    "lr": 2e-05,
+    "bs": 16,
+    "max_len": 128,
+    "seed": 1,
+    "keep_emoji": false
+  },
+  "train_seconds": 335,
+  "params_m": 126.0,
+  "disk_mb": 503.9,
+  "cpu_latency_ms": 216.6,
+  "val": {
+    "eval_loss": 0.41912874579429626,
+    "eval_macro_f1": 0.8166741614125699,
+    "eval_accuracy": 0.8253333333333334,
+    "eval_runtime": 1.2554,
+    "eval_samples_per_second": 597.411,
+    "eval_steps_per_second": 9.559,
+    "epoch": 4.0
+  },
+  "test": {
+    "accuracy": 0.8264,
+    "macro_f1": 0.8156387293923181,
+    "macro_precision": 0.8271610045017348,
+    "macro_recall": 0.8095934716624371,
+    "weighted_f1": 0.8240125657923354,
+    "off_f1": 0.7710970464135021
+  },
+  "gpu": "Tesla T4"
+}
