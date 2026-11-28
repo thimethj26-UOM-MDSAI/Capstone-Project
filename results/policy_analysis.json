@@ -1,0 +1,262 @@
+{
+  "created": "2026-11-28T12:56:26",
+  "model": "xlmr",
+  "chosen_thresholds": {
+    "flag": 0.45,
+    "remove": 0.95,
+    "source": "calibrated on validation set (n=750): remove>=0.95 for precision>=0.9, flag>=0.45 for recall>=0.9, model=xlmr"
+  },
+  "validation": {
+    "sensitivity": [
+      {
+        "flag": 0.45,
+        "remove": 0.8,
+        "n": 750,
+        "removed": 277,
+        "flagged": 97,
+        "published": 376,
+        "share_removed": 0.36933333333333335,
+        "share_flagged": 0.12933333333333333,
+        "share_published": 0.5013333333333333,
+        "removal_precision": 0.8592057761732852,
+        "false_removals": 39,
+        "false_removal_rate": 0.09027777777777778,
+        "off_total": 318,
+        "off_auto_removed": 238,
+        "off_in_review": 52,
+        "off_published_missed": 28,
+        "auto_removed_rate": 0.7484276729559748,
+        "caught_rate": 0.9119496855345912,
+        "missed_rate": 0.0880503144654088,
+        "review_queue_offensive_share": 0.5360824742268041,
+        "notoff_sent_to_review": 45,
+        "notoff_sent_to_review_rate": 0.10416666666666667,
+        "notoff_published_rate": 0.8055555555555556,
+        "confusion": {
+          "NOT": [
+            39,
+            45,
+            348
+          ],
+          "OFF": [
+            238,
+            52,
+            28
+          ]
+        },
+        "precision_target": 0.85,
+        "is_chosen": false
+      },
+      {
+        "flag": 0.45,
+        "remove": 0.95,
+        "n": 750,
+        "removed": 212,
+        "flagged": 162,
+        "published": 376,
+        "share_removed": 0.2826666666666667,
+        "share_flagged": 0.216,
+        "share_published": 0.5013333333333333,
+        "removal_precision": 0.9292452830188679,
+        "false_removals": 15,
+        "false_removal_rate": 0.034722222222222224,
+        "off_total": 318,
+        "off_auto_removed": 197,
+        "off_in_review": 93,
+        "off_published_missed": 28,
+        "auto_removed_rate": 0.6194968553459119,
+        "caught_rate": 0.9119496855345912,
+        "missed_rate": 0.0880503144654088,
+        "review_queue_offensive_share": 0.5740740740740741,
+        "notoff_sent_to_review": 69,
+        "notoff_sent_to_review_rate": 0.1597222222222222,
+        "notoff_published_rate": 0.8055555555555556,
+        "confusion": {
+          "NOT": [
+            15,
+            69,
+            348
+          ],
+          "OFF": [
+            197,
+            93,
+            28
+          ]
+        },
+        "precision_target": 0.9,
+        "is_chosen": true
+      },
+      {
+        "flag": 0.45,
+        "remove": null,
+        "n": 750,
+        "removed": 0,
+        "flagged": 374,
+        "published": 376,
+        "share_removed": 0.0,
+        "share_flagged": 0.49866666666666665,
+        "share_published": 0.5013333333333333,
+        "removal_precision": null,
+        "false_removals": 0,
+        "false_removal_rate": 0.0,
+        "off_total": 318,
+        "off_auto_removed": 0,
+        "off_in_review": 290,
+        "off_published_missed": 28,
+        "auto_removed_rate": 0.0,
+        "caught_rate": 0.9119496855345912,
+        "missed_rate": 0.0880503144654088,
+        "review_queue_offensive_share": 0.7754010695187166,
+        "notoff_sent_to_review": 84,
+        "notoff_sent_to_review_rate": 0.19444444444444445,
+        "notoff_published_rate": 0.8055555555555556,
+        "confusion": {
+          "NOT": [
+            0,
+            84,
+            348
+          ],
+          "OFF": [
+            0,
+            290,
+            28
+          ]
+        },
+        "precision_target": 0.95,
+        "is_chosen": false
+      }
+    ]
+  },
+  "test": {
+    "flag": 0.45,
+    "remove": 0.95,
+    "n": 2500,
+    "removed": 721,
+    "flagged": 493,
+    "published": 1286,
+    "share_removed": 0.2884,
+    "share_flagged": 0.1972,
+    "share_published": 0.5144,
+    "removal_precision": 0.8890429958391124,
+    "false_removals": 80,
+    "false_removal_rate": 0.05387205387205387,
+    "off_total": 1015,
+    "off_auto_removed": 641,
+    "off_in_review": 244,
+    "off_published_missed": 130,
+    "auto_removed_rate": 0.6315270935960591,
+    "caught_rate": 0.8719211822660099,
+    "missed_rate": 0.12807881773399016,
+    "review_queue_offensive_share": 0.4949290060851927,
+    "notoff_sent_to_review": 249,
+    "notoff_sent_to_review_rate": 0.16767676767676767,
+    "notoff_published_rate": 0.7784511784511785,
+    "confusion": {
+      "NOT": [
+        80,
+        249,
+        1156
+      ],
+      "OFF": [
+        641,
+        244,
+        130
+      ]
+    },
+    "macro_f1_at_0_5": 0.8188866025465681,
+    "training_run_macro_f1": 0.8184985321525586,
+    "ece": 0.08876007376741615,
+    "reliability": [
+      {
+        "bin": [
+          0.0,
+          0.1
+        ],
+        "n": 865,
+        "mean_prob": 0.032766426828921356,
+        "frac_offensive": 0.047398843930635835
+      },
+      {
+        "bin": [
+          0.1,
+          0.2
+        ],
+        "n": 181,
+        "mean_prob": 0.14760770698113995,
+        "frac_offensive": 0.15469613259668508
+      },
+      {
+        "bin": [
+          0.2,
+          0.30000000000000004
+        ],
+        "n": 109,
+        "mean_prob": 0.24266950362319245,
+        "frac_offensive": 0.23853211009174313
+      },
+      {
+        "bin": [
+          0.30000000000000004,
+          0.4
+        ],
+        "n": 93,
+        "mean_prob": 0.34765933790514547,
+        "frac_offensive": 0.25806451612903225
+      },
+      {
+        "bin": [
+          0.4,
+          0.5
+        ],
+        "n": 73,
+        "mean_prob": 0.44904252968422353,
+        "frac_offensive": 0.3013698630136986
+      },
+      {
+        "bin": [
+          0.5,
+          0.6000000000000001
+        ],
+        "n": 78,
+        "mean_prob": 0.550960219059235,
+        "frac_offensive": 0.46153846153846156
+      },
+      {
+        "bin": [
+          0.6000000000000001,
+          0.7000000000000001
+        ],
+        "n": 83,
+        "mean_prob": 0.6558699507311166,
+        "frac_offensive": 0.40963855421686746
+      },
+      {
+        "bin": [
+          0.7000000000000001,
+          0.8
+        ],
+        "n": 87,
+        "mean_prob": 0.7477374405696474,
+        "frac_offensive": 0.4367816091954023
+      },
+      {
+        "bin": [
+          0.8,
+          0.9
+        ],
+        "n": 123,
+        "mean_prob": 0.8481948312705125,
+        "frac_offensive": 0.5609756097560976
+      },
+      {
+        "bin": [
+          0.9,
+          1.0
+        ],
+        "n": 808,
+        "mean_prob": 0.984657815629893,
+        "frac_offensive": 0.8626237623762376
+      }
+    ]
+  }
+}
