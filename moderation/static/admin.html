@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Moderator dashboard (demo)</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,"Iskoola Pota","Noto Sans Sinhala",sans-serif;background:#0f172a;color:#e2e8f0}
+header{padding:12px 18px;display:flex;gap:14px;align-items:center;background:#111c33;border-bottom:1px solid #1e293b}
+header h1{font-size:18px;margin:0;flex:1}a{color:#93c5fd}button{font:inherit;cursor:pointer}
+main{max-width:1000px;margin:16px auto;padding:0 14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px}
+.stat{background:#1e293b;border-radius:10px;padding:10px 12px}.stat b{font-size:24px;display:block}.stat span{font-size:12px;color:#94a3b8}
+.info{background:#1e293b;border-radius:10px;padding:10px 12px;font-size:13px;color:#cbd5e1;margin-bottom:12px}
+.bar{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.tab{background:#1e293b;color:#e2e8f0;border:0;border-radius:16px;padding:5px 14px}.tab.on{background:#2563eb}
+.btn{background:#334155;color:#fff;border:0;border-radius:6px;padding:6px 12px}.btn.p{background:#2563eb}.btn.g{background:#16a34a}.btn.r{background:#dc2626}
+.item{background:#1e293b;border-radius:10px;margin-bottom:8px;overflow:hidden}
+.head{display:flex;gap:10px;align-items:center;padding:10px 12px;cursor:pointer}.head .t{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{font-size:11px;border-radius:10px;padding:2px 9px;color:#fff}.s-published{background:#475569}.s-flagged{background:#d97706}.s-removed{background:#dc2626}.s-restored{background:#16a34a}
+.body{padding:10px 14px 14px;border-top:1px solid #334155;display:none}.item.open .body{display:block}
+.txt{font-size:18px;line-height:1.9;margin:6px 0 10px;word-break:break-word}.w{border-radius:4px;padding:1px 3px;margin:0 1px}
+.meter{position:relative;height:14px;background:#334155;border-radius:7px;margin:6px 0 22px}.fill{height:100%;border-radius:7px;background:linear-gradient(90deg,#16a34a,#d97706,#dc2626)}
+.tick{position:absolute;top:-4px;width:2px;height:22px;background:#fff}.tick small{position:absolute;top:24px;left:-24px;font-size:11px;width:50px;text-align:center;color:#cbd5e1}
+.kv{font-size:13px;color:#94a3b8;margin:4px 0}.ev{font-size:12px;color:#94a3b8;border-left:2px solid #334155;padding-left:8px;margin:2px 0}
+.actions{margin-top:10px;display:flex;gap:8px}.empty{color:#94a3b8;text-align:center;padding:28px}
+</style></head><body>
+<header><h1>Moderator dashboard <small style="color:#94a3b8">demo</small></h1><a href="/">&larr; Social feed</a></header>
+<main><div class="cards" id="stats"></div><div class="info" id="info"></div>
+<div class="bar" id="tabs"></div><div id="list"></div></main>
+<script>
+const $=id=>document.getElementById(id);let filter='all',open=new Set();
+const api=async(u,o)=>{const r=await fetch(u,o);if(!r.ok)throw new Error((await r.json().catch(()=>({}))).detail||r.statusText);return r.json()};
+function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+const fmt=t=>new Date(t*1000).toLocaleTimeString();
+async function act(id,a){try{await api('/api/admin/items/'+id+'/action',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:a})})}catch(e){alert(e.message)}refresh()}
+function detail(i,body){
+ const tx=el('div','txt');i.words.forEach((w,k)=>{const s=el('span','w',w.word);if(w.impact>0.02)s.style.background='rgba(239,68,68,'+Math.min(.85,.25+w.impact*1.3)+')';s.title='removing this word changes P(offensive) by '+(-w.impact).toFixed(3);tx.appendChild(s);tx.appendChild(document.createTextNode(' '))});
+ body.appendChild(el('div','kv','Original text, words shaded by how much they pushed the score toward "offensive" (hover for numbers):'));body.appendChild(tx);
+ const m=el('div','meter');const f=el('div','fill');f.style.width=(i.prob*100)+'%';m.appendChild(f);
+ [[i.t_flag,'flag '+i.t_flag],[i.t_remove,'remove '+i.t_remove]].forEach(([v,l])=>{const t=el('div','tick');t.style.left=(v*100)+'%';t.appendChild(el('small','',l));m.appendChild(t)});
+ body.appendChild(el('div','kv','Offensive probability: '+i.prob.toFixed(3)));body.appendChild(m);
+ const top=[...i.words].filter(w=>w.impact>0.02).sort((a,b)=>b.impact-a.impact).slice(0,5).map(w=>w.word+' (+'+w.impact.toFixed(2)+')');
+ body.appendChild(el('div','kv','Decision: '+i.status.toUpperCase()+' | key words: '+(top.join(', ')||'none above 0.02')));
+ body.appendChild(el('div','kv','Model: '+i.model+' | scanned '+fmt(i.scanned_at)+' | human reviewed: '+(i.reviewed?'yes':'no')));
+ const ev=el('div');ev.appendChild(el('div','kv','Audit log:'));body.appendChild(ev);
+ let loaded=false;const loadEv=()=>{if(loaded)return;loaded=true;api('/api/admin/items/'+i.id).then(d=>d.events.forEach(e=>ev.appendChild(el('div','ev',fmt(e.ts)+'  '+e.event+'  '+(e.detail||'')))))};
+ body.loadEv=loadEv;if(open.has(i.id))loadEv();
+ const a=el('div','actions');
+ if(i.status==='removed')a.appendChild(btn('Restore (false positive)','g',()=>act(i.id,'restore')));
+ if(i.status==='flagged'){a.appendChild(btn('Approve (keep visible)','g',()=>act(i.id,'approve')));a.appendChild(btn('Confirm removal','r',()=>act(i.id,'confirm_removal')))}
+ body.appendChild(a)}
+function btn(t,c,f){const b=el('button','btn '+c,t);b.onclick=f;return b}
+async function refresh(){
+ const s=await api('/api/admin/stats');$('stats').textContent='';
+ [['Scanned',s.total],['Published',s.published],['Flagged',s.flagged],['Removed',s.removed],['Restored',s.restored],['Overturned by moderators',s.overturned_by_moderators]].forEach(([l,v])=>{const c=el('div','stat');c.appendChild(el('b','',v));c.appendChild(el('span','',l));$('stats').appendChild(c)});
+ $('info').textContent='Model: '+s.model+' | thresholds: flag >= '+s.thresholds.flag+', remove >= '+s.thresholds.remove+' ('+s.thresholds.source+')';
+ const tb=$('tabs');tb.textContent='';['all','flagged','removed','restored','published'].forEach(t=>{const b=el('button','tab'+(t===filter?' on':''),t[0].toUpperCase()+t.slice(1));b.onclick=()=>{filter=t;refresh()};tb.appendChild(b)});
+ const sp=el('span');sp.style.flex='1';tb.appendChild(sp);
+ tb.appendChild(btn('Re-scan all unreviewed','p',async()=>{const r=await api('/api/admin/rescan',{method:'POST'});alert('Scanned '+r.scanned+' items, '+r.changed+' decisions changed');refresh()}));
+ tb.appendChild(btn('Load demo data','',async()=>{try{await api('/api/admin/seed',{method:'POST'})}catch(e){alert(e.message)}refresh()}));
+ const items=await api('/api/admin/items?status='+filter);const L=$('list');L.textContent='';
+ if(!items.length)L.appendChild(el('div','empty','Nothing here yet. Use "Load demo data", or post from the social feed.'));
+ items.forEach(i=>{const d=el('div','item'+(open.has(i.id)?' open':''));const h=el('div','head');
+  h.appendChild(el('span','pill s-'+i.status,i.status));h.appendChild(el('span','',i.kind+' by '+i.author));h.appendChild(el('span','t',i.text));h.appendChild(el('span','kv',i.prob==null?'':i.prob.toFixed(2)));
+  const body=el('div','body');h.onclick=()=>{open.has(i.id)?open.delete(i.id):open.add(i.id);d.classList.toggle('open');if(open.has(i.id))body.loadEv()};
+  detail(i,body);d.append(h,body);L.appendChild(d)})}
+refresh();setInterval(refresh,6000);
+</script></body></html>
