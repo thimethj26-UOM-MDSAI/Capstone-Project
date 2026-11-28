@@ -69,7 +69,7 @@ Test-set macro-F1 (official 2,500-tweet SOLD test split, scored once with the va
 
 ## System architecture
 
-![Architecture](docs/architecture.png)
+The diagram is in [`docs/architecture.png`](docs/architecture.png) (editable source: [`docs/architecture.svg`](docs/architecture.svg)).
 
 **Offline (top).** SOLD is preprocessed and split, three models are trained and compared, the chosen model is calibrated into a three-way policy on validation data, and that policy is evaluated once on the test set.
 
@@ -346,3 +346,5 @@ Then open <http://127.0.0.1:8000/> (feed) and <http://127.0.0.1:8000/admin> (mod
 - Ranasinghe, T., Anuradha, I., Premasiri, D., Silva, K., Hettiarachchi, H., Uyangodage, L., Zampieri, M. (2025). *SOLD: Sinhala Offensive Language Dataset.* Language Resources and Evaluation, 59, 297-337. <https://doi.org/10.1007/s10579-024-09723-1>
 - Dhananjaya, V., Demotte, P., Ranathunga, S., Jayasena, S. (2022). *BERTifying Sinhala: A Comprehensive Analysis of Pre-trained Language Models for Sinhala Text Classification.* LREC 2022, pp. 7377-7385. (source of SinBERT)
 - Conneau, A., et al. (2020). *Unsupervised Cross-lingual Representation Learning at Scale.* ACL 2020. (XLM-R)
+
+**Use of AI tools.** An AI assistant (Claude, by Anthropic) was used to help write and debug code and to draft documentation. All experiments were run by the author, and the design decisions and results are the author's to explain and defend.
